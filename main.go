@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"flag"
@@ -42,5 +43,10 @@ func run(args runArgs) error {
 	if err := json.Unmarshal(data, &vars); err != nil {
 		return err
 	}
-	return tpl.Execute(os.Stdout, vars)
+	var buf bytes.Buffer
+	if err := tpl.Execute(&buf, vars); err != nil {
+		return err
+	}
+	_, err = os.Stdout.ReadFrom(&buf)
+	return err
 }
