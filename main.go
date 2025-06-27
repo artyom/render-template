@@ -12,30 +12,25 @@ import (
 
 func main() {
 	log.SetFlags(0)
-	args := runArgs{}
-	flag.StringVar(&args.t, "t", args.t, "path to the template, see: https://pkg.go.dev/text/template")
-	flag.StringVar(&args.v, "v", args.v, "path to JSON mapping of variables to use in template, see:\nhttps://pkg.go.dev/encoding/json#Unmarshal")
+	var tPath, vPath string
+	flag.StringVar(&tPath, "t", tPath, "path to the template, see: https://pkg.go.dev/text/template")
+	flag.StringVar(&vPath, "v", vPath, "path to JSON mapping of variables to use in template, see:\nhttps://pkg.go.dev/encoding/json#Unmarshal")
 	flag.Parse()
-	if err := run(args); err != nil {
+	if err := run(tPath, vPath); err != nil {
 		log.Fatal(err)
 	}
 }
 
-type runArgs struct {
-	t string
-	v string
-}
-
-func run(args runArgs) error {
-	if args.t == "" || args.v == "" {
+func run(tPath, vPath string) error {
+	if tPath == "" || vPath == "" {
 		return errors.New("need both template and variables")
 	}
-	tpl, err := template.ParseFiles(args.t)
+	tpl, err := template.ParseFiles(tPath)
 	if err != nil {
 		return err
 	}
 	tpl = tpl.Option("missingkey=error")
-	data, err := os.ReadFile(args.v)
+	data, err := os.ReadFile(vPath)
 	if err != nil {
 		return err
 	}
